@@ -12,7 +12,7 @@
 <meta name="author" content="Enrique José Esis Sulbarán" />
 
 
-<title>Examen_R_Data_Science_final (Función_antiguedad_reclamos)</title>
+<title>Función de antiguedad de reclamos</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -2933,8 +2933,7 @@ border-radius: 0px;
 
 
 
-<h1 class="title toc-ignore">Examen_R_Data_Science_final
-(Función_antiguedad_reclamos)</h1>
+<h1 class="title toc-ignore">Función de antiguedad de reclamos</h1>
 <h4 class="author"><span style="color: blue;">Enrique José Esis
 Sulbarán</span></h4>
 
@@ -2945,17 +2944,15 @@ Sulbarán</span></h4>
 <h1><span class="header-section-number">1</span> Repositorio en
 GitHub</h1>
 <ul>
-<li>—&gt; <a href="https://github.com/EnriqueEsis/Examen-_R_Data_Science_final">URL</a></li>
+<li>—&gt; <a href="https://github.com/EnriqueEsis/Examen-_R_Data_Science_final">ENLACE</a></li>
 </ul>
 </div>
-<div id="objetivo-de-investigación" class="section level1" number="2">
-<h1><span class="header-section-number">2</span> Objetivo de
-investigación</h1>
+<div id="objetivo-principal" class="section level1" number="2">
+<h1><span class="header-section-number">2</span> Objetivo principal</h1>
 <p>Desarrollar una función que realice un análisis integral del conjunto
 de datos de reclamos para entender su estructura, limpiar y preparar los
-datos, calcular la antigüedad de los reclamos y realizar un resumen en
-una tabla de contingencia sobre la cantidad de reclamos agrupados por
-rangos de antigüedad.</p>
+datos, calcular la antigüedad de los reclamos y realizar un resumen
+sobre la cantidad de reclamos agrupados por rangos de antigüedad.</p>
 </div>
 <div id="objetivos-específicos" class="section level1" number="3">
 <h1><span class="header-section-number">3</span> Objetivos
@@ -2972,8 +2969,17 @@ del ticket y la fecha de última modificación del archivo para calcular
 la antigüedad de los reclamos en horas.</p></li>
 <li><p><strong>4)</strong> Clasificar los reclamos en rangos de
 antigüedad y sumar la cantidad de avisos para cada rango.</p></li>
-<li><p><strong>5)</strong> Generar una tabla resumen que muestre la
-cantidad total de reclamos por cada rango de antigüedad.</p></li>
+<li><p><strong>5)</strong> Generar un resumen que muestre la cantidad
+total de reclamos por cada rango de antigüedad.</p></li>
+<li><p><strong>6)</strong> Crear un archivo HTML en R Markdown que pueda
+ser publicado en la web y que incluya:</p>
+<ul>
+<li>Un enlace directo al repositorio de GitHub del proyecto.</li>
+<li>Una descripción detallada del proyecto, incluyendo objetivos,
+metodología y resultados.</li>
+<li>Un apartado sobre las pruebas realizadas para validar la función,
+mostrando ejemplos y resultados esperados.</li>
+</ul></li>
 </ul>
 </div>
 <div id="descripción-de-las-variables" class="section level1" number="4">
@@ -3019,83 +3025,78 @@ específico.</p></li>
 <span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a>  <span class="co"># Leer el archivo CSV</span></span>
 <span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a>  df <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(ruta_archivo, <span class="at">sep =</span> <span class="st">&quot;,&quot;</span>)</span>
 <span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a>  </span>
-<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a>    <span class="co"># Verificar si el data.frame está vacío</span></span>
-<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">nrow</span>(df) <span class="sc">==</span> <span class="dv">0</span>) {</span>
-<span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a>    <span class="fu">return</span>(<span class="fu">data.frame</span>(<span class="at">ANTIGUEDAD =</span> <span class="fu">character</span>(), <span class="at">RECLAMOS =</span> <span class="fu">numeric</span>()))</span>
-<span id="cb2-14"><a href="#cb2-14" tabindex="-1"></a>  }</span>
-<span id="cb2-15"><a href="#cb2-15" tabindex="-1"></a>  </span>
-<span id="cb2-16"><a href="#cb2-16" tabindex="-1"></a>  <span class="co"># Verificar las columnas esperadas</span></span>
-<span id="cb2-17"><a href="#cb2-17" tabindex="-1"></a>  columnas_esperadas <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;ESTADO_TICKET&quot;</span>, <span class="st">&quot;TIPO_EVENTO&quot;</span>,</span>
-<span id="cb2-18"><a href="#cb2-18" tabindex="-1"></a>                          <span class="st">&quot;CANTIDAD_AVISOS&quot;</span>, <span class="st">&quot;FECHA_HORA_CREACION_TICKET&quot;</span>)</span>
-<span id="cb2-19"><a href="#cb2-19" tabindex="-1"></a>  <span class="cf">if</span> (<span class="sc">!</span><span class="fu">all</span>(columnas_esperadas <span class="sc">%in%</span> <span class="fu">colnames</span>(df))) {</span>
-<span id="cb2-20"><a href="#cb2-20" tabindex="-1"></a>    <span class="fu">stop</span>(<span class="st">&quot;El archivo base no contiene las columnas esperadas, verifique el archivo.&quot;</span>)</span>
-<span id="cb2-21"><a href="#cb2-21" tabindex="-1"></a>  }</span>
-<span id="cb2-22"><a href="#cb2-22" tabindex="-1"></a>  </span>
-<span id="cb2-23"><a href="#cb2-23" tabindex="-1"></a>  <span class="co"># Cambiar los puntos por guiones bajos en los nombres de las columnas</span></span>
-<span id="cb2-24"><a href="#cb2-24" tabindex="-1"></a>  <span class="fu">colnames</span>(df) <span class="ot">&lt;-</span> <span class="fu">gsub</span>(<span class="st">&quot;</span><span class="sc">\\</span><span class="st">.&quot;</span>, <span class="st">&quot;_&quot;</span>, <span class="fu">colnames</span>(df))</span>
-<span id="cb2-25"><a href="#cb2-25" tabindex="-1"></a>  </span>
-<span id="cb2-26"><a href="#cb2-26" tabindex="-1"></a>  <span class="co"># Filtrar las filas donde el estado del ticket sea &#39;Activo&#39; o &#39;Asignado&#39;</span></span>
-<span id="cb2-27"><a href="#cb2-27" tabindex="-1"></a>  df <span class="ot">&lt;-</span> <span class="fu">subset</span>(df, ESTADO_TICKET <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">&#39;Activo&#39;</span>, <span class="st">&#39;Asignado&#39;</span>))</span>
-<span id="cb2-28"><a href="#cb2-28" tabindex="-1"></a>  </span>
-<span id="cb2-29"><a href="#cb2-29" tabindex="-1"></a>  <span class="co"># Filtrar las filas donde el tipo de evento sea &#39;Avería&#39;</span></span>
-<span id="cb2-30"><a href="#cb2-30" tabindex="-1"></a>  df <span class="ot">&lt;-</span> <span class="fu">subset</span>(df, TIPO_EVENTO <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">&#39;Avería&#39;</span>))</span>
-<span id="cb2-31"><a href="#cb2-31" tabindex="-1"></a>  </span>
-<span id="cb2-32"><a href="#cb2-32" tabindex="-1"></a>  <span class="co"># Eliminar filas donde CANTIDAD_AVISOS o Reclamos es igual a 0</span></span>
-<span id="cb2-33"><a href="#cb2-33" tabindex="-1"></a>  df <span class="ot">&lt;-</span> df[df<span class="sc">$</span>CANTIDAD_AVISOS <span class="sc">&gt;</span> <span class="dv">0</span>, ]</span>
-<span id="cb2-34"><a href="#cb2-34" tabindex="-1"></a>  </span>
-<span id="cb2-35"><a href="#cb2-35" tabindex="-1"></a>  <span class="co"># Obtener la información del archivo para usar fecha de modificación</span></span>
-<span id="cb2-36"><a href="#cb2-36" tabindex="-1"></a>  info_archivo <span class="ot">&lt;-</span> <span class="fu">file.info</span>(ruta_archivo)</span>
-<span id="cb2-37"><a href="#cb2-37" tabindex="-1"></a>  </span>
-<span id="cb2-38"><a href="#cb2-38" tabindex="-1"></a>  <span class="co"># Extraer y formatear la fecha de última modificación</span></span>
-<span id="cb2-39"><a href="#cb2-39" tabindex="-1"></a>  fecha_ultima_modificacion <span class="ot">&lt;-</span> info_archivo<span class="sc">$</span>mtime</span>
-<span id="cb2-40"><a href="#cb2-40" tabindex="-1"></a>  fecha_formateada <span class="ot">&lt;-</span> <span class="fu">format</span>(fecha_ultima_modificacion, <span class="st">&#39;%d-%m-%Y %H:%M:%S&#39;</span>)</span>
+<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a>  <span class="co"># Verificar las columnas esperadas</span></span>
+<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a>  columnas_esperadas <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;ESTADO_TICKET&quot;</span>, <span class="st">&quot;TIPO_EVENTO&quot;</span>,</span>
+<span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a>                          <span class="st">&quot;CANTIDAD_AVISOS&quot;</span>, <span class="st">&quot;FECHA_HORA_CREACION_TICKET&quot;</span>)</span>
+<span id="cb2-14"><a href="#cb2-14" tabindex="-1"></a>  <span class="cf">if</span> (<span class="sc">!</span><span class="fu">all</span>(columnas_esperadas <span class="sc">%in%</span> <span class="fu">colnames</span>(df))) {</span>
+<span id="cb2-15"><a href="#cb2-15" tabindex="-1"></a>    <span class="fu">stop</span>(<span class="st">&quot;El archivo base no contiene las columnas esperadas, verifique el archivo.&quot;</span>)</span>
+<span id="cb2-16"><a href="#cb2-16" tabindex="-1"></a>  }</span>
+<span id="cb2-17"><a href="#cb2-17" tabindex="-1"></a>  </span>
+<span id="cb2-18"><a href="#cb2-18" tabindex="-1"></a>  <span class="co"># Cambiar los puntos por guiones bajos en los nombres de las columnas</span></span>
+<span id="cb2-19"><a href="#cb2-19" tabindex="-1"></a>  <span class="fu">colnames</span>(df) <span class="ot">&lt;-</span> <span class="fu">gsub</span>(<span class="st">&quot;</span><span class="sc">\\</span><span class="st">.&quot;</span>, <span class="st">&quot;_&quot;</span>, <span class="fu">colnames</span>(df))</span>
+<span id="cb2-20"><a href="#cb2-20" tabindex="-1"></a>  </span>
+<span id="cb2-21"><a href="#cb2-21" tabindex="-1"></a>  <span class="co"># Filtrar las filas donde el estado del ticket sea &#39;Activo&#39; o &#39;Asignado&#39;</span></span>
+<span id="cb2-22"><a href="#cb2-22" tabindex="-1"></a>  df <span class="ot">&lt;-</span> <span class="fu">subset</span>(df, ESTADO_TICKET <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">&#39;Activo&#39;</span>, <span class="st">&#39;Asignado&#39;</span>))</span>
+<span id="cb2-23"><a href="#cb2-23" tabindex="-1"></a>  </span>
+<span id="cb2-24"><a href="#cb2-24" tabindex="-1"></a>  <span class="co"># Filtrar las filas donde el tipo de evento sea &#39;Avería&#39;</span></span>
+<span id="cb2-25"><a href="#cb2-25" tabindex="-1"></a>  df <span class="ot">&lt;-</span> <span class="fu">subset</span>(df, TIPO_EVENTO <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">&#39;Avería&#39;</span>))</span>
+<span id="cb2-26"><a href="#cb2-26" tabindex="-1"></a>  </span>
+<span id="cb2-27"><a href="#cb2-27" tabindex="-1"></a>  <span class="co"># Eliminar filas donde CANTIDAD_AVISOS o Reclamos es igual a 0</span></span>
+<span id="cb2-28"><a href="#cb2-28" tabindex="-1"></a>  df <span class="ot">&lt;-</span> df[df<span class="sc">$</span>CANTIDAD_AVISOS <span class="sc">&gt;</span> <span class="dv">0</span>, ]</span>
+<span id="cb2-29"><a href="#cb2-29" tabindex="-1"></a>  </span>
+<span id="cb2-30"><a href="#cb2-30" tabindex="-1"></a>  <span class="co"># Obtener la información del archivo para usar fecha de modificación</span></span>
+<span id="cb2-31"><a href="#cb2-31" tabindex="-1"></a>  info_archivo <span class="ot">&lt;-</span> <span class="fu">file.info</span>(ruta_archivo)</span>
+<span id="cb2-32"><a href="#cb2-32" tabindex="-1"></a>  </span>
+<span id="cb2-33"><a href="#cb2-33" tabindex="-1"></a>  <span class="co"># Extraer y formatear la fecha de última modificación</span></span>
+<span id="cb2-34"><a href="#cb2-34" tabindex="-1"></a>  fecha_ultima_modificacion <span class="ot">&lt;-</span> info_archivo<span class="sc">$</span>mtime</span>
+<span id="cb2-35"><a href="#cb2-35" tabindex="-1"></a>  fecha_formateada <span class="ot">&lt;-</span> <span class="fu">format</span>(fecha_ultima_modificacion, <span class="st">&#39;%d-%m-%Y %H:%M:%S&#39;</span>)</span>
+<span id="cb2-36"><a href="#cb2-36" tabindex="-1"></a>  </span>
+<span id="cb2-37"><a href="#cb2-37" tabindex="-1"></a>  <span class="co"># Agregar la columna con la fecha de última modificación formateada</span></span>
+<span id="cb2-38"><a href="#cb2-38" tabindex="-1"></a>  df <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span></span>
+<span id="cb2-39"><a href="#cb2-39" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">FECHA_FILE =</span> <span class="fu">as.POSIXct</span>(fecha_formateada,</span>
+<span id="cb2-40"><a href="#cb2-40" tabindex="-1"></a>                                   <span class="at">format=</span><span class="st">&quot;%d-%m-%Y %H:%M:%S&quot;</span>, <span class="at">tz=</span><span class="st">&quot;America/Santiago&quot;</span>))</span>
 <span id="cb2-41"><a href="#cb2-41" tabindex="-1"></a>  </span>
-<span id="cb2-42"><a href="#cb2-42" tabindex="-1"></a>  <span class="co"># Agregar la columna con la fecha de última modificación formateada</span></span>
-<span id="cb2-43"><a href="#cb2-43" tabindex="-1"></a>  df <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span></span>
-<span id="cb2-44"><a href="#cb2-44" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">FECHA_FILE =</span> <span class="fu">as.POSIXct</span>(fecha_formateada,</span>
-<span id="cb2-45"><a href="#cb2-45" tabindex="-1"></a>                                   <span class="at">format=</span><span class="st">&quot;%d-%m-%Y %H:%M:%S&quot;</span>, <span class="at">tz=</span><span class="st">&quot;America/Santiago&quot;</span>))</span>
-<span id="cb2-46"><a href="#cb2-46" tabindex="-1"></a>  </span>
-<span id="cb2-47"><a href="#cb2-47" tabindex="-1"></a>  <span class="co"># Convertir las fechas a tipo POSIXct</span></span>
-<span id="cb2-48"><a href="#cb2-48" tabindex="-1"></a>  df<span class="sc">$</span>FECHA_HORA_CREACION_TICKET <span class="ot">&lt;-</span> <span class="fu">as.POSIXct</span>(df<span class="sc">$</span>FECHA_HORA_CREACION_TICKET,</span>
-<span id="cb2-49"><a href="#cb2-49" tabindex="-1"></a>                                              <span class="at">format=</span><span class="st">&quot;%d-%m-%Y %H:%M:%S&quot;</span>, <span class="at">tz=</span><span class="st">&quot;America/Santiago&quot;</span>)</span>
+<span id="cb2-42"><a href="#cb2-42" tabindex="-1"></a>  <span class="co"># Convertir las fechas a tipo POSIXct</span></span>
+<span id="cb2-43"><a href="#cb2-43" tabindex="-1"></a>  df<span class="sc">$</span>FECHA_HORA_CREACION_TICKET <span class="ot">&lt;-</span> <span class="fu">as.POSIXct</span>(df<span class="sc">$</span>FECHA_HORA_CREACION_TICKET,</span>
+<span id="cb2-44"><a href="#cb2-44" tabindex="-1"></a>                                              <span class="at">format=</span><span class="st">&quot;%d-%m-%Y %H:%M:%S&quot;</span>, <span class="at">tz=</span><span class="st">&quot;America/Santiago&quot;</span>)</span>
+<span id="cb2-45"><a href="#cb2-45" tabindex="-1"></a>  </span>
+<span id="cb2-46"><a href="#cb2-46" tabindex="-1"></a>  <span class="co"># Calcular la antigüedad en horas</span></span>
+<span id="cb2-47"><a href="#cb2-47" tabindex="-1"></a>  df <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span></span>
+<span id="cb2-48"><a href="#cb2-48" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">ANTIGUEDAD_H =</span> <span class="fu">as.numeric</span>(<span class="fu">difftime</span>(FECHA_FILE,</span>
+<span id="cb2-49"><a href="#cb2-49" tabindex="-1"></a>                                              FECHA_HORA_CREACION_TICKET, <span class="at">units =</span> <span class="st">&quot;hours&quot;</span>)))</span>
 <span id="cb2-50"><a href="#cb2-50" tabindex="-1"></a>  </span>
-<span id="cb2-51"><a href="#cb2-51" tabindex="-1"></a>  <span class="co"># Calcular la antigüedad en horas</span></span>
+<span id="cb2-51"><a href="#cb2-51" tabindex="-1"></a>  <span class="co"># Crear la columna &#39;ANTIGUEDAD&#39; basada en &#39;ANTIGUEDAD_H&#39;</span></span>
 <span id="cb2-52"><a href="#cb2-52" tabindex="-1"></a>  df <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span></span>
-<span id="cb2-53"><a href="#cb2-53" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">ANTIGUEDAD_H =</span> <span class="fu">as.numeric</span>(<span class="fu">difftime</span>(FECHA_FILE,</span>
-<span id="cb2-54"><a href="#cb2-54" tabindex="-1"></a>                                              FECHA_HORA_CREACION_TICKET, <span class="at">units =</span> <span class="st">&quot;hours&quot;</span>)))</span>
-<span id="cb2-55"><a href="#cb2-55" tabindex="-1"></a>  </span>
-<span id="cb2-56"><a href="#cb2-56" tabindex="-1"></a>  <span class="co"># Crear la columna &#39;ANTIGUEDAD&#39; basada en &#39;ANTIGUEDAD_H&#39;</span></span>
-<span id="cb2-57"><a href="#cb2-57" tabindex="-1"></a>  df <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span></span>
-<span id="cb2-58"><a href="#cb2-58" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">ANTIGUEDAD =</span> <span class="fu">case_when</span>(</span>
-<span id="cb2-59"><a href="#cb2-59" tabindex="-1"></a>      ANTIGUEDAD_H <span class="sc">&lt;=</span> <span class="dv">4</span> <span class="sc">~</span> <span class="st">&quot;Menor a 4&quot;</span>,</span>
-<span id="cb2-60"><a href="#cb2-60" tabindex="-1"></a>      ANTIGUEDAD_H <span class="sc">&gt;</span> <span class="dv">4</span> <span class="sc">&amp;</span> ANTIGUEDAD_H <span class="sc">&lt;</span> <span class="dv">8</span> <span class="sc">~</span> <span class="st">&quot;4 a 7&quot;</span>,</span>
-<span id="cb2-61"><a href="#cb2-61" tabindex="-1"></a>      ANTIGUEDAD_H <span class="sc">&gt;=</span> <span class="dv">8</span> <span class="sc">&amp;</span> ANTIGUEDAD_H <span class="sc">&lt;</span> <span class="dv">12</span> <span class="sc">~</span> <span class="st">&quot;8 a 11&quot;</span>,</span>
-<span id="cb2-62"><a href="#cb2-62" tabindex="-1"></a>      ANTIGUEDAD_H <span class="sc">&gt;=</span> <span class="dv">12</span> <span class="sc">&amp;</span> ANTIGUEDAD_H <span class="sc">&lt;</span> <span class="dv">24</span> <span class="sc">~</span> <span class="st">&quot;12 a 23&quot;</span>,</span>
-<span id="cb2-63"><a href="#cb2-63" tabindex="-1"></a>      ANTIGUEDAD_H <span class="sc">&gt;=</span> <span class="dv">24</span> <span class="sc">&amp;</span> ANTIGUEDAD_H <span class="sc">&lt;</span> <span class="dv">48</span> <span class="sc">~</span> <span class="st">&quot;24 a 47&quot;</span>,</span>
-<span id="cb2-64"><a href="#cb2-64" tabindex="-1"></a>      ANTIGUEDAD_H <span class="sc">&gt;=</span> <span class="dv">48</span> <span class="sc">~</span> <span class="st">&quot;Más de 48&quot;</span>,</span>
-<span id="cb2-65"><a href="#cb2-65" tabindex="-1"></a>      <span class="cn">TRUE</span> <span class="sc">~</span> <span class="cn">NA_character_</span>  <span class="co"># Manejo de valores fuera de rango, si es necesario</span></span>
-<span id="cb2-66"><a href="#cb2-66" tabindex="-1"></a>    ))</span>
+<span id="cb2-53"><a href="#cb2-53" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">ANTIGUEDAD =</span> <span class="fu">case_when</span>(</span>
+<span id="cb2-54"><a href="#cb2-54" tabindex="-1"></a>      ANTIGUEDAD_H <span class="sc">&lt;=</span> <span class="dv">4</span> <span class="sc">~</span> <span class="st">&quot;Menor a 4&quot;</span>,</span>
+<span id="cb2-55"><a href="#cb2-55" tabindex="-1"></a>      ANTIGUEDAD_H <span class="sc">&gt;</span> <span class="dv">4</span> <span class="sc">&amp;</span> ANTIGUEDAD_H <span class="sc">&lt;</span> <span class="dv">8</span> <span class="sc">~</span> <span class="st">&quot;4 a 7&quot;</span>,</span>
+<span id="cb2-56"><a href="#cb2-56" tabindex="-1"></a>      ANTIGUEDAD_H <span class="sc">&gt;=</span> <span class="dv">8</span> <span class="sc">&amp;</span> ANTIGUEDAD_H <span class="sc">&lt;</span> <span class="dv">12</span> <span class="sc">~</span> <span class="st">&quot;8 a 11&quot;</span>,</span>
+<span id="cb2-57"><a href="#cb2-57" tabindex="-1"></a>      ANTIGUEDAD_H <span class="sc">&gt;=</span> <span class="dv">12</span> <span class="sc">&amp;</span> ANTIGUEDAD_H <span class="sc">&lt;</span> <span class="dv">24</span> <span class="sc">~</span> <span class="st">&quot;12 a 23&quot;</span>,</span>
+<span id="cb2-58"><a href="#cb2-58" tabindex="-1"></a>      ANTIGUEDAD_H <span class="sc">&gt;=</span> <span class="dv">24</span> <span class="sc">&amp;</span> ANTIGUEDAD_H <span class="sc">&lt;</span> <span class="dv">48</span> <span class="sc">~</span> <span class="st">&quot;24 a 47&quot;</span>,</span>
+<span id="cb2-59"><a href="#cb2-59" tabindex="-1"></a>      ANTIGUEDAD_H <span class="sc">&gt;=</span> <span class="dv">48</span> <span class="sc">~</span> <span class="st">&quot;Más de 48&quot;</span>,</span>
+<span id="cb2-60"><a href="#cb2-60" tabindex="-1"></a>      <span class="cn">TRUE</span> <span class="sc">~</span> <span class="cn">NA_character_</span>  <span class="co"># Manejo de valores fuera de rango, si es necesario</span></span>
+<span id="cb2-61"><a href="#cb2-61" tabindex="-1"></a>    ))</span>
+<span id="cb2-62"><a href="#cb2-62" tabindex="-1"></a>  </span>
+<span id="cb2-63"><a href="#cb2-63" tabindex="-1"></a>  <span class="co"># Agrupar por ANTIGUEDAD y sumar CANTIDAD_AVISOS</span></span>
+<span id="cb2-64"><a href="#cb2-64" tabindex="-1"></a>  tabla_resumen <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span></span>
+<span id="cb2-65"><a href="#cb2-65" tabindex="-1"></a>    <span class="fu">group_by</span>(ANTIGUEDAD) <span class="sc">%&gt;%</span></span>
+<span id="cb2-66"><a href="#cb2-66" tabindex="-1"></a>    <span class="fu">summarise</span>(<span class="at">RECLAMOS =</span> <span class="fu">sum</span>(CANTIDAD_AVISOS, <span class="at">na.rm =</span> <span class="cn">TRUE</span>))</span>
 <span id="cb2-67"><a href="#cb2-67" tabindex="-1"></a>  </span>
-<span id="cb2-68"><a href="#cb2-68" tabindex="-1"></a>  <span class="co"># Agrupar por ANTIGUEDAD y sumar CANTIDAD_AVISOS</span></span>
-<span id="cb2-69"><a href="#cb2-69" tabindex="-1"></a>  tabla_resumen <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span></span>
-<span id="cb2-70"><a href="#cb2-70" tabindex="-1"></a>    <span class="fu">group_by</span>(ANTIGUEDAD) <span class="sc">%&gt;%</span></span>
-<span id="cb2-71"><a href="#cb2-71" tabindex="-1"></a>    <span class="fu">summarise</span>(<span class="at">RECLAMOS =</span> <span class="fu">sum</span>(CANTIDAD_AVISOS, <span class="at">na.rm =</span> <span class="cn">TRUE</span>))</span>
-<span id="cb2-72"><a href="#cb2-72" tabindex="-1"></a>  </span>
-<span id="cb2-73"><a href="#cb2-73" tabindex="-1"></a>  <span class="co"># Definir el orden específico para ANTIGUEDAD</span></span>
-<span id="cb2-74"><a href="#cb2-74" tabindex="-1"></a>  orden <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;Menor a 4&quot;</span>, <span class="st">&quot;4 a 7&quot;</span>, <span class="st">&quot;8 a 11&quot;</span>, <span class="st">&quot;12 a 23&quot;</span>, <span class="st">&quot;24 a 47&quot;</span>, <span class="st">&quot;Más de 48&quot;</span>)</span>
-<span id="cb2-75"><a href="#cb2-75" tabindex="-1"></a>  </span>
-<span id="cb2-76"><a href="#cb2-76" tabindex="-1"></a>  <span class="co"># Convertir ANTIGUEDAD en un factor con niveles ordenados</span></span>
-<span id="cb2-77"><a href="#cb2-77" tabindex="-1"></a>  tabla_resumen<span class="sc">$</span>ANTIGUEDAD <span class="ot">&lt;-</span> <span class="fu">factor</span>(tabla_resumen<span class="sc">$</span>ANTIGUEDAD, <span class="at">levels =</span> orden)</span>
-<span id="cb2-78"><a href="#cb2-78" tabindex="-1"></a>  </span>
-<span id="cb2-79"><a href="#cb2-79" tabindex="-1"></a>  <span class="co"># Ordenar el dataframe según la columna ANTIGUEDAD</span></span>
-<span id="cb2-80"><a href="#cb2-80" tabindex="-1"></a>  tabla_resumen <span class="ot">&lt;-</span> tabla_resumen <span class="sc">%&gt;%</span></span>
-<span id="cb2-81"><a href="#cb2-81" tabindex="-1"></a>    <span class="fu">arrange</span>(ANTIGUEDAD)</span>
-<span id="cb2-82"><a href="#cb2-82" tabindex="-1"></a>  </span>
-<span id="cb2-83"><a href="#cb2-83" tabindex="-1"></a>  <span class="co"># Asignar la clase &quot;resumen_reclamos&quot; al resultado</span></span>
-<span id="cb2-84"><a href="#cb2-84" tabindex="-1"></a>  <span class="fu">class</span>(tabla_resumen) <span class="ot">&lt;-</span> <span class="st">&quot;resumen_reclamos&quot;</span></span>
-<span id="cb2-85"><a href="#cb2-85" tabindex="-1"></a>  </span>
-<span id="cb2-86"><a href="#cb2-86" tabindex="-1"></a>  <span class="fu">return</span>(tabla_resumen)</span>
-<span id="cb2-87"><a href="#cb2-87" tabindex="-1"></a>}</span></code></pre></div>
+<span id="cb2-68"><a href="#cb2-68" tabindex="-1"></a>  <span class="co"># Definir el orden específico para ANTIGUEDAD</span></span>
+<span id="cb2-69"><a href="#cb2-69" tabindex="-1"></a>  orden <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;Menor a 4&quot;</span>, <span class="st">&quot;4 a 7&quot;</span>, <span class="st">&quot;8 a 11&quot;</span>, <span class="st">&quot;12 a 23&quot;</span>, <span class="st">&quot;24 a 47&quot;</span>, <span class="st">&quot;Más de 48&quot;</span>)</span>
+<span id="cb2-70"><a href="#cb2-70" tabindex="-1"></a>  </span>
+<span id="cb2-71"><a href="#cb2-71" tabindex="-1"></a>  <span class="co"># Convertir ANTIGUEDAD en un factor con niveles ordenados</span></span>
+<span id="cb2-72"><a href="#cb2-72" tabindex="-1"></a>  tabla_resumen<span class="sc">$</span>ANTIGUEDAD <span class="ot">&lt;-</span> <span class="fu">factor</span>(tabla_resumen<span class="sc">$</span>ANTIGUEDAD, <span class="at">levels =</span> orden)</span>
+<span id="cb2-73"><a href="#cb2-73" tabindex="-1"></a>  </span>
+<span id="cb2-74"><a href="#cb2-74" tabindex="-1"></a>  <span class="co"># Ordenar el dataframe según la columna ANTIGUEDAD</span></span>
+<span id="cb2-75"><a href="#cb2-75" tabindex="-1"></a>  tabla_resumen <span class="ot">&lt;-</span> tabla_resumen <span class="sc">%&gt;%</span></span>
+<span id="cb2-76"><a href="#cb2-76" tabindex="-1"></a>    <span class="fu">arrange</span>(ANTIGUEDAD)</span>
+<span id="cb2-77"><a href="#cb2-77" tabindex="-1"></a>  </span>
+<span id="cb2-78"><a href="#cb2-78" tabindex="-1"></a>  <span class="co"># Asignar la clase &quot;resumen_reclamos&quot; al resultado</span></span>
+<span id="cb2-79"><a href="#cb2-79" tabindex="-1"></a>  <span class="fu">class</span>(tabla_resumen) <span class="ot">&lt;-</span> <span class="st">&quot;resumen_reclamos&quot;</span></span>
+<span id="cb2-80"><a href="#cb2-80" tabindex="-1"></a>  </span>
+<span id="cb2-81"><a href="#cb2-81" tabindex="-1"></a>  <span class="fu">return</span>(tabla_resumen)</span>
+<span id="cb2-82"><a href="#cb2-82" tabindex="-1"></a>}</span></code></pre></div>
 </div>
 <div id="resultados-y-medición-de-eficiencia-de-la-función" class="section level1" number="7">
 <h1><span class="header-section-number">7</span> Resultados y medición
@@ -3122,59 +3123,134 @@ de eficiencia de la función</h1>
 <span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a></span>
 <span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a><span class="co"># Imprimir el tiempo de ejecución de la función</span></span>
 <span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a><span class="fu">print</span>(fin <span class="sc">-</span> inicio)</span></code></pre></div>
-<pre><code>## Time difference of 0.08901405 secs</code></pre>
+<pre><code>## Time difference of 0.103652 secs</code></pre>
 </div>
 <div id="pruebas-realizadas" class="section level1" number="8">
 <h1><span class="header-section-number">8</span> Pruebas realizadas</h1>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="co"># Crear datos de prueba</span></span>
-<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>create_test_data <span class="ot">&lt;-</span> <span class="cf">function</span>() {</span>
-<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>  df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
-<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a>    <span class="at">ESTADO_TICKET =</span> <span class="fu">c</span>(<span class="st">&quot;Activo&quot;</span>, <span class="st">&quot;Asignado&quot;</span>, <span class="st">&quot;Cerrado&quot;</span>, <span class="st">&quot;Activo&quot;</span>, <span class="st">&quot;Asignado&quot;</span>),</span>
-<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a>    <span class="at">TIPO_EVENTO =</span> <span class="fu">c</span>(<span class="st">&quot;Avería&quot;</span>, <span class="st">&quot;Avería&quot;</span>, <span class="st">&quot;Avería&quot;</span>, <span class="st">&quot;Mantenimiento&quot;</span>, <span class="st">&quot;Avería&quot;</span>),</span>
-<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a>    <span class="at">CANTIDAD_AVISOS =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">5</span>, <span class="dv">2</span>, <span class="dv">10</span>),</span>
-<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a>    <span class="at">FECHA_HORA_CREACION_TICKET =</span> <span class="fu">c</span>(</span>
-<span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a>      <span class="st">&quot;2024-07-15 08:00:00&quot;</span>,</span>
-<span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a>      <span class="st">&quot;2024-07-15 10:00:00&quot;</span>,</span>
-<span id="cb7-10"><a href="#cb7-10" tabindex="-1"></a>      <span class="st">&quot;2024-07-14 12:00:00&quot;</span>,</span>
-<span id="cb7-11"><a href="#cb7-11" tabindex="-1"></a>      <span class="st">&quot;2024-07-15 09:00:00&quot;</span>,</span>
-<span id="cb7-12"><a href="#cb7-12" tabindex="-1"></a>      <span class="st">&quot;2024-07-15 07:00:00&quot;</span></span>
-<span id="cb7-13"><a href="#cb7-13" tabindex="-1"></a>    )</span>
-<span id="cb7-14"><a href="#cb7-14" tabindex="-1"></a>  )</span>
-<span id="cb7-15"><a href="#cb7-15" tabindex="-1"></a>  </span>
-<span id="cb7-16"><a href="#cb7-16" tabindex="-1"></a>  <span class="fu">write.csv</span>(df, <span class="st">&quot;test_data.csv&quot;</span>, <span class="at">row.names =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb7-17"><a href="#cb7-17" tabindex="-1"></a>}</span>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="co"># Crear datos de prueba </span></span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>  <span class="at">ESTADO_TICKET =</span> <span class="fu">c</span>(<span class="st">&quot;Activo&quot;</span>, <span class="st">&quot;Asignado&quot;</span>, <span class="st">&quot;Cerrado&quot;</span>, <span class="st">&quot;Activo&quot;</span>, <span class="st">&quot;Asignado&quot;</span>),</span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a>  <span class="at">TIPO_EVENTO =</span> <span class="fu">c</span>(<span class="st">&quot;Avería&quot;</span>, <span class="st">&quot;Avería&quot;</span>, <span class="st">&quot;Avería&quot;</span>, <span class="st">&quot;Mantenimiento&quot;</span>, <span class="st">&quot;Avería&quot;</span>),</span>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a>  <span class="at">CANTIDAD_AVISOS =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">5</span>, <span class="dv">2</span>, <span class="dv">10</span>),</span>
+<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a>  <span class="at">FECHA_HORA_CREACION_TICKET =</span> <span class="fu">c</span>(</span>
+<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a>    <span class="st">&quot;2024-07-15 08:00:00&quot;</span>,</span>
+<span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a>    <span class="st">&quot;2024-07-15 10:00:00&quot;</span>,</span>
+<span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a>    <span class="st">&quot;2024-07-14 12:00:00&quot;</span>,</span>
+<span id="cb7-10"><a href="#cb7-10" tabindex="-1"></a>    <span class="st">&quot;2024-07-15 09:00:00&quot;</span>,</span>
+<span id="cb7-11"><a href="#cb7-11" tabindex="-1"></a>    <span class="st">&quot;2024-07-15 07:00:00&quot;</span></span>
+<span id="cb7-12"><a href="#cb7-12" tabindex="-1"></a>  )</span>
+<span id="cb7-13"><a href="#cb7-13" tabindex="-1"></a>)</span>
+<span id="cb7-14"><a href="#cb7-14" tabindex="-1"></a></span>
+<span id="cb7-15"><a href="#cb7-15" tabindex="-1"></a><span class="co"># Guardar los datos en un archivo CSV Temporal</span></span>
+<span id="cb7-16"><a href="#cb7-16" tabindex="-1"></a><span class="fu">write.csv</span>(df, <span class="st">&quot;test_data.csv&quot;</span>, <span class="at">row.names =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb7-17"><a href="#cb7-17" tabindex="-1"></a></span>
 <span id="cb7-18"><a href="#cb7-18" tabindex="-1"></a></span>
-<span id="cb7-19"><a href="#cb7-19" tabindex="-1"></a><span class="co"># Llamar a la función para crear datos de prueba</span></span>
-<span id="cb7-20"><a href="#cb7-20" tabindex="-1"></a><span class="fu">create_test_data</span>()</span>
-<span id="cb7-21"><a href="#cb7-21" tabindex="-1"></a></span>
-<span id="cb7-22"><a href="#cb7-22" tabindex="-1"></a><span class="co"># Función para limpiar los archivos temporales después de las pruebas</span></span>
-<span id="cb7-23"><a href="#cb7-23" tabindex="-1"></a>cleanup <span class="ot">&lt;-</span> <span class="cf">function</span>() {</span>
-<span id="cb7-24"><a href="#cb7-24" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">file.exists</span>(<span class="st">&quot;test_data.csv&quot;</span>)) <span class="fu">file.remove</span>(<span class="st">&quot;test_data.csv&quot;</span>)</span>
-<span id="cb7-25"><a href="#cb7-25" tabindex="-1"></a>}</span>
+<span id="cb7-19"><a href="#cb7-19" tabindex="-1"></a><span class="co"># Crear datos de prueba faltantes para las pruebas Temporal</span></span>
+<span id="cb7-20"><a href="#cb7-20" tabindex="-1"></a>df_missing_columns <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb7-21"><a href="#cb7-21" tabindex="-1"></a>  <span class="at">ESTADO_TICKET =</span> <span class="fu">c</span>(<span class="st">&quot;Activo&quot;</span>, <span class="st">&quot;Asignado&quot;</span>, <span class="st">&quot;Cerrado&quot;</span>, <span class="st">&quot;Activo&quot;</span>, <span class="st">&quot;Asignado&quot;</span>),</span>
+<span id="cb7-22"><a href="#cb7-22" tabindex="-1"></a>  <span class="at">TIPO_EVENTO =</span> <span class="fu">c</span>(<span class="st">&quot;Avería&quot;</span>, <span class="st">&quot;Avería&quot;</span>, <span class="st">&quot;Avería&quot;</span>, <span class="st">&quot;Mantenimiento&quot;</span>, <span class="st">&quot;Avería&quot;</span>)</span>
+<span id="cb7-23"><a href="#cb7-23" tabindex="-1"></a>)</span>
+<span id="cb7-24"><a href="#cb7-24" tabindex="-1"></a><span class="fu">write.csv</span>(df_missing_columns, <span class="st">&quot;test_data_missing_columns.csv&quot;</span>, <span class="at">row.names =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb7-25"><a href="#cb7-25" tabindex="-1"></a></span>
 <span id="cb7-26"><a href="#cb7-26" tabindex="-1"></a></span>
-<span id="cb7-27"><a href="#cb7-27" tabindex="-1"></a><span class="co"># Crear datos de prueba antes de cada prueba</span></span>
-<span id="cb7-28"><a href="#cb7-28" tabindex="-1"></a><span class="fu">setup</span>({</span>
-<span id="cb7-29"><a href="#cb7-29" tabindex="-1"></a>  <span class="fu">create_test_data</span>()</span>
-<span id="cb7-30"><a href="#cb7-30" tabindex="-1"></a>})</span>
-<span id="cb7-31"><a href="#cb7-31" tabindex="-1"></a></span>
-<span id="cb7-32"><a href="#cb7-32" tabindex="-1"></a><span class="co"># Limpiar archivos temporales después de cada prueba</span></span>
-<span id="cb7-33"><a href="#cb7-33" tabindex="-1"></a><span class="fu">teardown</span>({</span>
-<span id="cb7-34"><a href="#cb7-34" tabindex="-1"></a>  <span class="fu">cleanup</span>()</span>
-<span id="cb7-35"><a href="#cb7-35" tabindex="-1"></a>})</span>
-<span id="cb7-36"><a href="#cb7-36" tabindex="-1"></a></span>
-<span id="cb7-37"><a href="#cb7-37" tabindex="-1"></a><span class="co"># Prueba: antiguedad_reclamos maneja archivos no existentes</span></span>
-<span id="cb7-38"><a href="#cb7-38" tabindex="-1"></a><span class="fu">test_that</span>(<span class="st">&quot;antiguedad_reclamos maneja archivos no existentes&quot;</span>, {</span>
-<span id="cb7-39"><a href="#cb7-39" tabindex="-1"></a>  </span>
-<span id="cb7-40"><a href="#cb7-40" tabindex="-1"></a>  <span class="fu">expect_error</span>(<span class="fu">antiguedad_reclamos</span>(<span class="st">&quot;archivo_no_existente.csv&quot;</span>), </span>
-<span id="cb7-41"><a href="#cb7-41" tabindex="-1"></a>               <span class="st">&quot;El archivo especificado no existe, verifique la rura.&quot;</span>)</span>
-<span id="cb7-42"><a href="#cb7-42" tabindex="-1"></a>})</span></code></pre></div>
-<pre><code>## Test passed 😸</code></pre>
+<span id="cb7-27"><a href="#cb7-27" tabindex="-1"></a></span>
+<span id="cb7-28"><a href="#cb7-28" tabindex="-1"></a><span class="co"># Función de prueba</span></span>
+<span id="cb7-29"><a href="#cb7-29" tabindex="-1"></a>antiguedad_reclamos <span class="ot">&lt;-</span> <span class="cf">function</span>(file_path) {</span>
+<span id="cb7-30"><a href="#cb7-30" tabindex="-1"></a>  <span class="cf">if</span> (<span class="sc">!</span><span class="fu">file.exists</span>(file_path)) {</span>
+<span id="cb7-31"><a href="#cb7-31" tabindex="-1"></a>    <span class="fu">stop</span>(<span class="st">&quot;El archivo especificado no existe, verifique la ruta.&quot;</span>)</span>
+<span id="cb7-32"><a href="#cb7-32" tabindex="-1"></a>  }</span>
+<span id="cb7-33"><a href="#cb7-33" tabindex="-1"></a>  </span>
+<span id="cb7-34"><a href="#cb7-34" tabindex="-1"></a>  df <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(file_path)</span>
+<span id="cb7-35"><a href="#cb7-35" tabindex="-1"></a>  </span>
+<span id="cb7-36"><a href="#cb7-36" tabindex="-1"></a>  required_columns <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;ESTADO_TICKET&quot;</span>, <span class="st">&quot;TIPO_EVENTO&quot;</span>,</span>
+<span id="cb7-37"><a href="#cb7-37" tabindex="-1"></a>                        <span class="st">&quot;CANTIDAD_AVISOS&quot;</span>, <span class="st">&quot;FECHA_HORA_CREACION_TICKET&quot;</span>)</span>
+<span id="cb7-38"><a href="#cb7-38" tabindex="-1"></a>  </span>
+<span id="cb7-39"><a href="#cb7-39" tabindex="-1"></a>  <span class="cf">if</span> (<span class="sc">!</span><span class="fu">all</span>(required_columns <span class="sc">%in%</span> <span class="fu">colnames</span>(df))) {</span>
+<span id="cb7-40"><a href="#cb7-40" tabindex="-1"></a>    <span class="fu">stop</span>(<span class="st">&quot;El archivo base no contiene las columnas esperadas, verifique el archivo.&quot;</span>)</span>
+<span id="cb7-41"><a href="#cb7-41" tabindex="-1"></a>  }</span>
+<span id="cb7-42"><a href="#cb7-42" tabindex="-1"></a>  </span>
+<span id="cb7-43"><a href="#cb7-43" tabindex="-1"></a>   <span class="co"># Cambiar los puntos por guiones bajos en los nombres de las columnas</span></span>
+<span id="cb7-44"><a href="#cb7-44" tabindex="-1"></a>  <span class="fu">colnames</span>(df) <span class="ot">&lt;-</span> <span class="fu">gsub</span>(<span class="st">&quot;</span><span class="sc">\\</span><span class="st">.&quot;</span>, <span class="st">&quot;_&quot;</span>, <span class="fu">colnames</span>(df))</span>
+<span id="cb7-45"><a href="#cb7-45" tabindex="-1"></a>  </span>
+<span id="cb7-46"><a href="#cb7-46" tabindex="-1"></a>  <span class="co"># Filtrar las filas donde el estado del ticket sea &#39;Activo&#39; o &#39;Asignado&#39;</span></span>
+<span id="cb7-47"><a href="#cb7-47" tabindex="-1"></a>  df <span class="ot">&lt;-</span> <span class="fu">subset</span>(df, ESTADO_TICKET <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">&#39;Activo&#39;</span>, <span class="st">&#39;Asignado&#39;</span>))</span>
+<span id="cb7-48"><a href="#cb7-48" tabindex="-1"></a>  </span>
+<span id="cb7-49"><a href="#cb7-49" tabindex="-1"></a>  <span class="co"># Filtrar las filas donde el tipo de evento sea &#39;Avería&#39;</span></span>
+<span id="cb7-50"><a href="#cb7-50" tabindex="-1"></a>  df <span class="ot">&lt;-</span> <span class="fu">subset</span>(df, TIPO_EVENTO <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">&#39;Avería&#39;</span>))</span>
+<span id="cb7-51"><a href="#cb7-51" tabindex="-1"></a>  </span>
+<span id="cb7-52"><a href="#cb7-52" tabindex="-1"></a>  <span class="co"># Eliminar filas donde CANTIDAD_AVISOS o Reclamos es igual a 0</span></span>
+<span id="cb7-53"><a href="#cb7-53" tabindex="-1"></a>  df <span class="ot">&lt;-</span> df[df<span class="sc">$</span>CANTIDAD_AVISOS <span class="sc">&gt;</span> <span class="dv">0</span>, ]</span>
+<span id="cb7-54"><a href="#cb7-54" tabindex="-1"></a>  </span>
+<span id="cb7-55"><a href="#cb7-55" tabindex="-1"></a>  <span class="co"># Obtener la información del archivo para usar fecha de modificación</span></span>
+<span id="cb7-56"><a href="#cb7-56" tabindex="-1"></a>  info_archivo <span class="ot">&lt;-</span> <span class="fu">file.info</span>(ruta_archivo)</span>
+<span id="cb7-57"><a href="#cb7-57" tabindex="-1"></a>  </span>
+<span id="cb7-58"><a href="#cb7-58" tabindex="-1"></a>  <span class="co"># Extraer y formatear la fecha de última modificación</span></span>
+<span id="cb7-59"><a href="#cb7-59" tabindex="-1"></a>  fecha_ultima_modificacion <span class="ot">&lt;-</span> info_archivo<span class="sc">$</span>mtime</span>
+<span id="cb7-60"><a href="#cb7-60" tabindex="-1"></a>  fecha_formateada <span class="ot">&lt;-</span> <span class="fu">format</span>(fecha_ultima_modificacion, <span class="st">&#39;%d-%m-%Y %H:%M:%S&#39;</span>)</span>
+<span id="cb7-61"><a href="#cb7-61" tabindex="-1"></a>  </span>
+<span id="cb7-62"><a href="#cb7-62" tabindex="-1"></a>  <span class="co"># Agregar la columna con la fecha de última modificación formateada</span></span>
+<span id="cb7-63"><a href="#cb7-63" tabindex="-1"></a>  df <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span></span>
+<span id="cb7-64"><a href="#cb7-64" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">FECHA_FILE =</span> <span class="fu">as.POSIXct</span>(fecha_formateada,</span>
+<span id="cb7-65"><a href="#cb7-65" tabindex="-1"></a>                                   <span class="at">format=</span><span class="st">&quot;%d-%m-%Y %H:%M:%S&quot;</span>, <span class="at">tz=</span><span class="st">&quot;America/Santiago&quot;</span>))</span>
+<span id="cb7-66"><a href="#cb7-66" tabindex="-1"></a>  </span>
+<span id="cb7-67"><a href="#cb7-67" tabindex="-1"></a>  <span class="co"># Convertir las fechas a tipo POSIXct</span></span>
+<span id="cb7-68"><a href="#cb7-68" tabindex="-1"></a>  df<span class="sc">$</span>FECHA_HORA_CREACION_TICKET <span class="ot">&lt;-</span> <span class="fu">as.POSIXct</span>(df<span class="sc">$</span>FECHA_HORA_CREACION_TICKET,</span>
+<span id="cb7-69"><a href="#cb7-69" tabindex="-1"></a>                                              <span class="at">format=</span><span class="st">&quot;%d-%m-%Y %H:%M:%S&quot;</span>, <span class="at">tz=</span><span class="st">&quot;America/Santiago&quot;</span>)</span>
+<span id="cb7-70"><a href="#cb7-70" tabindex="-1"></a>  </span>
+<span id="cb7-71"><a href="#cb7-71" tabindex="-1"></a>  <span class="co"># Calcular la antigüedad en horas</span></span>
+<span id="cb7-72"><a href="#cb7-72" tabindex="-1"></a>  df <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span></span>
+<span id="cb7-73"><a href="#cb7-73" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">ANTIGUEDAD_H =</span> <span class="fu">as.numeric</span>(<span class="fu">difftime</span>(FECHA_FILE,</span>
+<span id="cb7-74"><a href="#cb7-74" tabindex="-1"></a>                                              FECHA_HORA_CREACION_TICKET, <span class="at">units =</span> <span class="st">&quot;hours&quot;</span>)))</span>
+<span id="cb7-75"><a href="#cb7-75" tabindex="-1"></a>  </span>
+<span id="cb7-76"><a href="#cb7-76" tabindex="-1"></a>  <span class="co"># Crear la columna &#39;ANTIGUEDAD&#39; basada en &#39;ANTIGUEDAD_H&#39;</span></span>
+<span id="cb7-77"><a href="#cb7-77" tabindex="-1"></a>  df <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span></span>
+<span id="cb7-78"><a href="#cb7-78" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">ANTIGUEDAD =</span> <span class="fu">case_when</span>(</span>
+<span id="cb7-79"><a href="#cb7-79" tabindex="-1"></a>      ANTIGUEDAD_H <span class="sc">&lt;=</span> <span class="dv">4</span> <span class="sc">~</span> <span class="st">&quot;Menor a 4&quot;</span>,</span>
+<span id="cb7-80"><a href="#cb7-80" tabindex="-1"></a>      ANTIGUEDAD_H <span class="sc">&gt;</span> <span class="dv">4</span> <span class="sc">&amp;</span> ANTIGUEDAD_H <span class="sc">&lt;</span> <span class="dv">8</span> <span class="sc">~</span> <span class="st">&quot;4 a 7&quot;</span>,</span>
+<span id="cb7-81"><a href="#cb7-81" tabindex="-1"></a>      ANTIGUEDAD_H <span class="sc">&gt;=</span> <span class="dv">8</span> <span class="sc">&amp;</span> ANTIGUEDAD_H <span class="sc">&lt;</span> <span class="dv">12</span> <span class="sc">~</span> <span class="st">&quot;8 a 11&quot;</span>,</span>
+<span id="cb7-82"><a href="#cb7-82" tabindex="-1"></a>      ANTIGUEDAD_H <span class="sc">&gt;=</span> <span class="dv">12</span> <span class="sc">&amp;</span> ANTIGUEDAD_H <span class="sc">&lt;</span> <span class="dv">24</span> <span class="sc">~</span> <span class="st">&quot;12 a 23&quot;</span>,</span>
+<span id="cb7-83"><a href="#cb7-83" tabindex="-1"></a>      ANTIGUEDAD_H <span class="sc">&gt;=</span> <span class="dv">24</span> <span class="sc">&amp;</span> ANTIGUEDAD_H <span class="sc">&lt;</span> <span class="dv">48</span> <span class="sc">~</span> <span class="st">&quot;24 a 47&quot;</span>,</span>
+<span id="cb7-84"><a href="#cb7-84" tabindex="-1"></a>      ANTIGUEDAD_H <span class="sc">&gt;=</span> <span class="dv">48</span> <span class="sc">~</span> <span class="st">&quot;Más de 48&quot;</span>,</span>
+<span id="cb7-85"><a href="#cb7-85" tabindex="-1"></a>      <span class="cn">TRUE</span> <span class="sc">~</span> <span class="cn">NA_character_</span>  <span class="co"># Manejo de valores fuera de rango, si es necesario</span></span>
+<span id="cb7-86"><a href="#cb7-86" tabindex="-1"></a>    ))</span>
+<span id="cb7-87"><a href="#cb7-87" tabindex="-1"></a>  </span>
+<span id="cb7-88"><a href="#cb7-88" tabindex="-1"></a>  <span class="co"># Agrupar por ANTIGUEDAD y sumar CANTIDAD_AVISOS</span></span>
+<span id="cb7-89"><a href="#cb7-89" tabindex="-1"></a>  tabla_resumen <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span></span>
+<span id="cb7-90"><a href="#cb7-90" tabindex="-1"></a>    <span class="fu">group_by</span>(ANTIGUEDAD) <span class="sc">%&gt;%</span></span>
+<span id="cb7-91"><a href="#cb7-91" tabindex="-1"></a>    <span class="fu">summarise</span>(<span class="at">RECLAMOS =</span> <span class="fu">sum</span>(CANTIDAD_AVISOS, <span class="at">na.rm =</span> <span class="cn">TRUE</span>))</span>
+<span id="cb7-92"><a href="#cb7-92" tabindex="-1"></a>  </span>
+<span id="cb7-93"><a href="#cb7-93" tabindex="-1"></a>  <span class="co"># Definir el orden específico para ANTIGUEDAD</span></span>
+<span id="cb7-94"><a href="#cb7-94" tabindex="-1"></a>  orden <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;Menor a 4&quot;</span>, <span class="st">&quot;4 a 7&quot;</span>, <span class="st">&quot;8 a 11&quot;</span>, <span class="st">&quot;12 a 23&quot;</span>, <span class="st">&quot;24 a 47&quot;</span>, <span class="st">&quot;Más de 48&quot;</span>)</span>
+<span id="cb7-95"><a href="#cb7-95" tabindex="-1"></a>  </span>
+<span id="cb7-96"><a href="#cb7-96" tabindex="-1"></a>  <span class="co"># Convertir ANTIGUEDAD en un factor con niveles ordenados</span></span>
+<span id="cb7-97"><a href="#cb7-97" tabindex="-1"></a>  tabla_resumen<span class="sc">$</span>ANTIGUEDAD <span class="ot">&lt;-</span> <span class="fu">factor</span>(tabla_resumen<span class="sc">$</span>ANTIGUEDAD, <span class="at">levels =</span> orden)</span>
+<span id="cb7-98"><a href="#cb7-98" tabindex="-1"></a>  </span>
+<span id="cb7-99"><a href="#cb7-99" tabindex="-1"></a>  <span class="co"># Ordenar el dataframe según la columna ANTIGUEDAD</span></span>
+<span id="cb7-100"><a href="#cb7-100" tabindex="-1"></a>  tabla_resumen <span class="ot">&lt;-</span> tabla_resumen <span class="sc">%&gt;%</span></span>
+<span id="cb7-101"><a href="#cb7-101" tabindex="-1"></a>    <span class="fu">arrange</span>(ANTIGUEDAD)</span>
+<span id="cb7-102"><a href="#cb7-102" tabindex="-1"></a>  </span>
+<span id="cb7-103"><a href="#cb7-103" tabindex="-1"></a>  <span class="co"># Asignar la clase &quot;resumen_reclamos&quot; al resultado</span></span>
+<span id="cb7-104"><a href="#cb7-104" tabindex="-1"></a>  <span class="fu">class</span>(tabla_resumen) <span class="ot">&lt;-</span> <span class="st">&quot;resumen_reclamos&quot;</span></span>
+<span id="cb7-105"><a href="#cb7-105" tabindex="-1"></a>  </span>
+<span id="cb7-106"><a href="#cb7-106" tabindex="-1"></a>  </span>
+<span id="cb7-107"><a href="#cb7-107" tabindex="-1"></a>  <span class="co"># Lógica de la función (esto es solo un ejemplo)</span></span>
+<span id="cb7-108"><a href="#cb7-108" tabindex="-1"></a>  <span class="fu">return</span>(df)</span>
+<span id="cb7-109"><a href="#cb7-109" tabindex="-1"></a>}</span>
+<span id="cb7-110"><a href="#cb7-110" tabindex="-1"></a></span>
+<span id="cb7-111"><a href="#cb7-111" tabindex="-1"></a></span>
+<span id="cb7-112"><a href="#cb7-112" tabindex="-1"></a><span class="co"># Pruebas</span></span>
+<span id="cb7-113"><a href="#cb7-113" tabindex="-1"></a></span>
+<span id="cb7-114"><a href="#cb7-114" tabindex="-1"></a><span class="co"># Prueba: antiguedad_reclamos maneja archivos no existentes</span></span>
+<span id="cb7-115"><a href="#cb7-115" tabindex="-1"></a><span class="fu">test_that</span>(<span class="st">&quot;antiguedad_reclamos maneja archivos no existentes&quot;</span>, {</span>
+<span id="cb7-116"><a href="#cb7-116" tabindex="-1"></a>  <span class="fu">expect_error</span>(<span class="fu">antiguedad_reclamos</span>(<span class="st">&quot;archivo_no_existente.csv&quot;</span>), </span>
+<span id="cb7-117"><a href="#cb7-117" tabindex="-1"></a>               <span class="st">&quot;El archivo especificado no existe, verifique la ruta.&quot;</span>)</span>
+<span id="cb7-118"><a href="#cb7-118" tabindex="-1"></a>})</span></code></pre></div>
+<pre><code>## Test passed 🎉</code></pre>
 <div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a><span class="co"># Prueba: antiguedad_reclamos maneja archivos sin columnas esperadas</span></span>
 <span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a><span class="fu">test_that</span>(<span class="st">&quot;antiguedad_reclamos maneja archivos sin columnas esperadas&quot;</span>, {</span>
-<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a></span>
-<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a>  <span class="fu">expect_error</span>(<span class="fu">antiguedad_reclamos</span>(<span class="st">&quot;test_data_missing_columns.csv&quot;</span>), </span>
-<span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a>               <span class="st">&quot;El archivo base no contiene las columnas esperadas, verifique el archivo.&quot;</span>)</span>
-<span id="cb9-6"><a href="#cb9-6" tabindex="-1"></a>})</span></code></pre></div>
+<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a>  <span class="fu">expect_error</span>(<span class="fu">antiguedad_reclamos</span>(<span class="st">&quot;test_data_missing_columns.csv&quot;</span>), </span>
+<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a>               <span class="st">&quot;El archivo base no contiene las columnas esperadas, verifique el archivo.&quot;</span>)</span>
+<span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a>})</span></code></pre></div>
 <pre><code>## Test passed 😀</code></pre>
 </div>
 
@@ -3261,3 +3337,4 @@ $(document).ready(function ()  {
 
 </body>
 </html>
+
